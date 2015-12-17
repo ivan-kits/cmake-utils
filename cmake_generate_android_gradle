@@ -1,0 +1,95 @@
+#!/bin/bash
+#
+# cmake_generate_android_gradle
+# The purpose of this script is to setup the build directories
+# for every build type and architecture for the cmake project
+# under its own subfolder in the Android Studio project
+#
+# android_studio_project_root/
+# |- imported_cmake_project_module/
+# |  |- cmake/
+# |  |  |- debug/
+# |  |  |  |- armeabi/
+# |  |  |  |  |- android_gradle_build.json
+# |  |  |  |  `- ...
+# |  |  |  |- x86/
+# |  |  |  |  |- android_gradle_build.json
+# |  |  |  |  `- ...
+# |  |  |  `- ...
+# |  |  `- release/
+# |  |     `- ...
+# |  |- build.gradle
+# |  |- project/
+# |  |  `- ...
+# |  `- ...
+# `- ...
+
+# Path to root of CMake project build directories
+BUILD_ROOT=$(mkdir -p "$1" && cd "$1" && pwd)
+
+# Path to CMake project source
+SOURCE=$(cd "$2" && pwd)
+
+# Target API level
+# [ 3, 4, 5, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19, 21 ]
+API=$3
+
+# All or comma delimited list of target ABIs for which to build
+# [ arm64-v8a, armeabi,
+#   armeabi-v6 with VFP,
+#   armeabi-v7a, armeabi-v7a with NEON, armeabi-v7a with VFPV3,
+#   mips, mips64,
+#   x86, x86_64 ]
+# E.g., "all"
+# E.g., "armeabi-v7a with NEON,x86,mips"
+ABIS=$4
+
+# All remaining parameters will be passed to CMake as is
+# E.g., "-DCMAKE_C_FLAGS=-foo" "-DCMAKE_CXX_FLAGS=-bar -baz"
+shift 4
+
+SDK=$(cd "$(dirname ${BASH_SOURCE[0]})/.." && pwd)
+
+BUILD_TYPES='debug release'
+if [ "$ABIS" == all ]; then
+    ABIS='arm64-v8a,armeabi,armeabi-v7a,mips,mips64,x86,x86_64'
+fi
+
+for BUILD_TYPE in $BUILD_TYPES; do
+    IFS=,
+    for ABI in $ABIS; do
+        BUILD=$BUILD_ROOT/$BUILD_TYPE/$ABI/
+        mkdir -p "$BUILD"
+
+        "$SDK/cmake/bin/cmake" \
+            -H"$SOURCE" \
+            -B"$BUILD" \
+            -G 'Android Gradle - Ninja' \
+            -DANDROID_ABI=$ABI \
+            -DANDROID_NATIVE_API_LEVEL=$API \
+            -DANDROID_NDK="$SDK/ndk-bundle" \
+            -DCMAKE_BUILD_TYPE=$BUILD_TYPE \
+            -DCMAKE_MAKE_PROGRAM="$SDK/cmake/bin/ninja" \
+            -DCMAKE_TOOLCHAIN_FILE="$SDK/cmake/android.toolchain.cmake" \
+            "$@" &
+    done
+    unset IFS
+done
+
+wait
+
+ERROR=0
+
+for BUILD_TYPE in $BUILD_TYPES; do
+    IFS=,
+    for ABI in $ABIS; do
+        JSON=$BUILD_ROOT/$BUILD_TYPE/$ABI/android_gradle_build.json
+        if [ ! -f "$JSON" ]; then
+            ERROR=1
+            echo "Configuring for $BUILD_TYPE $ABI failed!" >&2
+        fi
+    done
+    unset IFS
+done
+
+exit $ERROR

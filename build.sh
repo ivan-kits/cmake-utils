@@ -108,11 +108,11 @@ CMAKE_OPTIONS+=(-DCMAKE_INSTALL_PREFIX="$INSTALL")
 case "$OS" in
     windows)
         install "${NINJA}.exe" "$INSTALL/bin/"
-        install "$CMAKE_UTILS/invoke_cmake.bat" "$INSTALL/"
+        install "$CMAKE_UTILS/cmake_generate_android_gradle.bat" "$INSTALL/"
         ;;
     *)
         install "$NINJA" "$INSTALL/bin/"
-        install "$CMAKE_UTILS/invoke_cmake.sh" "$INSTALL/"
+        install "$CMAKE_UTILS/cmake_generate_android_gradle" "$INSTALL/"
         ;;
 esac
 install "$ANDROID_CMAKE/android.toolchain.cmake" "$INSTALL/"
