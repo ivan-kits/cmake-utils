@@ -74,16 +74,9 @@ CONFIG=Release
 
 case "$OS" in
     linux)
-        CC="$PREBUILTS/clang/linux-x86/host/3.6/bin/clang"
-        CMAKE_OPTIONS+=(-DCMAKE_C_COMPILER="$CC")
-        CMAKE_OPTIONS+=(-DCMAKE_CXX_COMPILER="$CC++")
-
         TOOLCHAIN="$PREBUILTS/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8"
-        find "$TOOLCHAIN" -name x86_64-linux -exec ln -fns {} {}-gnu \;
-        CMAKE_FLAGS+=(--gcc-toolchain="$TOOLCHAIN")
-        CMAKE_FLAGS+=(--sysroot="$TOOLCHAIN/sysroot")
-        CMAKE_FLAGS+=(-B"$TOOLCHAIN/bin/x86_64-linux-")
-        CMAKE_OPTIONS+=(-DCMAKE_AR="$TOOLCHAIN/bin/x86_64-linux-ar")
+        CMAKE_OPTIONS+=(-DCMAKE_C_COMPILER="$TOOLCHAIN/bin/x86_64-linux-gcc")
+        CMAKE_OPTIONS+=(-DCMAKE_CXX_COMPILER="$TOOLCHAIN/bin/x86_64-linux-g++")
         ;;
     darwin)
         ;;
@@ -119,9 +112,3 @@ esac
 install "$ANDROID_CMAKE/android.toolchain.cmake" "$INSTALL/modules/"
 
 (cd "$INSTALL" && zip --symlinks -r "$DEST/cmake-${OS}-${BNUM}.zip" .)
-
-case "$OS" in
-    linux)
-        find "$TOOLCHAIN" -name x86_64-linux-gnu -type l -delete
-        ;;
-esac
