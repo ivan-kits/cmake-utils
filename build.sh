@@ -98,17 +98,16 @@ CMAKE_OPTIONS+=(-DCMAKE_INSTALL_PREFIX="$INSTALL")
 "${CMAKE[@]}" --build "$BUILD" --target test
 "${CMAKE[@]}" --build "$BUILD" --target install
 
-mkdir -p "$INSTALL/bin" "$INSTALL/scripts" "$INSTALL/modules"
 case "$OS" in
     windows)
         install "${NINJA}.exe" "$INSTALL/bin/"
-        install "$CMAKE_UTILS/invoke_cmake.bat" "$INSTALL/scripts/"
+        install "$CMAKE_UTILS/invoke_cmake.bat" "$INSTALL/"
         ;;
     *)
         install "$NINJA" "$INSTALL/bin/"
-        install "$CMAKE_UTILS/invoke_cmake.sh" "$INSTALL/scripts/"
+        install "$CMAKE_UTILS/invoke_cmake.sh" "$INSTALL/"
         ;;
 esac
-install "$ANDROID_CMAKE/android.toolchain.cmake" "$INSTALL/modules/"
+install "$ANDROID_CMAKE/android.toolchain.cmake" "$INSTALL/"
 
 (cd "$INSTALL" && zip --symlinks -r "$DEST/cmake-${OS}-${BNUM}.zip" .)
