@@ -110,4 +110,4 @@ case "$OS" in
 esac
 install "$ANDROID_CMAKE/android.toolchain.cmake" "$INSTALL/"
 
-(cd "$INSTALL" && zip --symlinks -r "$DEST/cmake-${OS}-${BNUM}.zip" .)
+(cd "$INSTALL" && zip -FSry "$DEST/cmake-${OS}-${BNUM}.zip" .)
