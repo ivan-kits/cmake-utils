@@ -77,6 +77,11 @@ case "$OS" in
         TOOLCHAIN=$PREBUILTS/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8
         CMAKE_OPTIONS+=(-DCMAKE_C_COMPILER="$TOOLCHAIN/bin/x86_64-linux-gcc")
         CMAKE_OPTIONS+=(-DCMAKE_CXX_COMPILER="$TOOLCHAIN/bin/x86_64-linux-g++")
+        CMAKE_OPTIONS+=(-DCMAKE_USE_OPENSSL=ON)
+        OPENSSL=$ROOT_DIR/external/openssl
+        CMAKE_OPTIONS+=(-DOPENSSL_INCLUDE_DIR="$OPENSSL/include")
+        CA_PATH=$ROOT_DIR/system/ca-certificates/files
+        CMAKE_OPTIONS+=(-DCURL_CA_PATH="$CA_PATH")
         ;;
     darwin)
         ;;
