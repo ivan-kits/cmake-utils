@@ -10,7 +10,7 @@ set -e
 # calculate the root directory from the script path
 # this script lives two directories down from the root
 # tools/cmake-utils/build.sh
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)"
+ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)
 cd "$ROOT_DIR"
 
 function die() {
@@ -21,17 +21,17 @@ echo "$*" > /dev/stderr
 
 (($# > 3)) && die "[$0] Unknown parameter: $4"
 
-OUT="$1"
-DEST="$2"
-BNUM="$3"
+OUT=$1
+DEST=$2
+BNUM=$3
 
 [ ! "$OUT"  ] && die "## Error: Missing out folder"
 [ ! "$DEST" ] && die "## Error: Missing destination folder"
 [ ! "$BNUM" ] && die "## Error: Missing build number"
 
 mkdir -p "$OUT" "$DEST"
-OUT="$(cd "$OUT" && pwd -P)"
-DEST="$(cd "$DEST" && pwd -P)"
+OUT=$(cd "$OUT" && pwd -P)
+DEST=$(cd "$DEST" && pwd -P)
 
 cat <<END_INFO
 ## Building android-studio ##
@@ -55,15 +55,15 @@ case "$OS" in
         ;;
 esac
 
-SOURCE="$ROOT_DIR/external/cmake"
-CMAKE_UTILS="$ROOT_DIR/tools/cmake-utils"
-ANDROID_CMAKE="$ROOT_DIR/external/android-cmake"
-PREBUILTS="$ROOT_DIR/prebuilts"
-NINJA="$PREBUILTS/ninja/${OS}-x86/ninja"
-CMAKE=("$PREBUILTS/cmake/${OS}-x86/bin/cmake")
+SOURCE=$ROOT_DIR/external/cmake
+CMAKE_UTILS=$ROOT_DIR/tools/cmake-utils
+ANDROID_CMAKE=$ROOT_DIR/external/android-cmake
+PREBUILTS=$ROOT_DIR/prebuilts
+NINJA=$PREBUILTS/ninja/$OS-x86/ninja
+CMAKE=("$PREBUILTS/cmake/$OS-x86/bin/cmake")
 
-BUILD="$OUT/cmake/build"
-INSTALL="$OUT/cmake/install"
+BUILD=$OUT/cmake/build
+INSTALL=$OUT/cmake/install
 rm -rf "$BUILD" "$INSTALL"
 mkdir -p "$BUILD" "$INSTALL"
 
@@ -74,7 +74,7 @@ CONFIG=Release
 
 case "$OS" in
     linux)
-        TOOLCHAIN="$PREBUILTS/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8"
+        TOOLCHAIN=$PREBUILTS/gcc/linux-x86/host/x86_64-linux-glibc2.15-4.8
         CMAKE_OPTIONS+=(-DCMAKE_C_COMPILER="$TOOLCHAIN/bin/x86_64-linux-gcc")
         CMAKE_OPTIONS+=(-DCMAKE_CXX_COMPILER="$TOOLCHAIN/bin/x86_64-linux-g++")
         ;;
