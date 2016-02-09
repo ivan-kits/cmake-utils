@@ -115,6 +115,6 @@ case "$OS" in
         install "$CMAKE_UTILS/cmake_generate_android_gradle" "$INSTALL/"
         ;;
 esac
-install "$ANDROID_CMAKE/android.toolchain.cmake" "$INSTALL/"
+install --mode=644 "$ANDROID_CMAKE/"*.cmake "$INSTALL/"
 
 (cd "$INSTALL" && zip -FSry "$DEST/cmake-${OS}-${BNUM}.zip" .)
