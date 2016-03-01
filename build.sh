@@ -87,8 +87,7 @@ case "$OS" in
         ;;
     windows)
         CMAKE=(env PATH=$(cygpath --unix 'C:\Windows\System32')
-               cmd /C "${VS120COMNTOOLS}VsDevCmd.bat" '&&'
-               "${CMAKE[@]}")
+               cmd /c "${VS120COMNTOOLS}VsDevCmd.bat" '&&' "${CMAKE[@]}")
         ;;
 esac
 
@@ -96,14 +95,14 @@ CMAKE_OPTIONS+=(-G Ninja)
 CMAKE_OPTIONS+=("$SOURCE")
 CMAKE_OPTIONS+=(-DCMAKE_MAKE_PROGRAM="$NINJA")
 CMAKE_OPTIONS+=(-DCMAKE_BUILD_TYPE=$CONFIG)
-CMAKE_OPTIONS+=(-DCMAKE_INSTALL_PREFIX="$INSTALL")
+CMAKE_OPTIONS+=(-DCMAKE_INSTALL_PREFIX=)
 
 (cd $BUILD && "${CMAKE[@]}" "${CMAKE_OPTIONS[@]}")
 "${CMAKE[@]}" --build "$BUILD"
 # TODO: fix tests on the builders
 # mostly caused by non-standard generator and compiler locations
 # "${CMAKE[@]}" --build "$BUILD" --target test
-"${CMAKE[@]}" --build "$BUILD" --target install
+DESTDIR="$INSTALL" "${CMAKE[@]}" --build "$BUILD" --target install
 
 case "$OS" in
     windows)
