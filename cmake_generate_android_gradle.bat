@@ -56,7 +56,7 @@ goto loop
 
 set SDK=%~dp0..
 
-set BUILD_TYPES=debug release
+set BUILD_TYPES=Debug Release
 if "%ABIS%" == "all" (
     set ABIS=arm64-v8a,armeabi,armeabi-v7a,mips,mips64,x86,x86_64
 )
