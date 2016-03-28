@@ -107,11 +107,9 @@ DESTDIR="$INSTALL" "${CMAKE[@]}" --build "$BUILD" --target install
 case "$OS" in
     windows)
         install "${NINJA}.exe" "$INSTALL/bin/"
-        install "$CMAKE_UTILS/cmake_generate_android_gradle.bat" "$INSTALL/"
         ;;
     *)
         install "$NINJA" "$INSTALL/bin/"
-        install "$CMAKE_UTILS/cmake_generate_android_gradle" "$INSTALL/"
         ;;
 esac
 install -m 644 "$ANDROID_CMAKE/"*.cmake "$INSTALL/"
