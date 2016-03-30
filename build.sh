@@ -114,4 +114,9 @@ case "$OS" in
 esac
 install -m 644 "$ANDROID_CMAKE/"*.cmake "$INSTALL/"
 
+# Use the last column of first line of cmake --version for revision number:
+# cmake version x.y.z
+REVISION=$("$INSTALL/bin/cmake" --version | awk 'NR==1{print $NF}')
+echo "Pkg.Revision=$REVISION" > "$INSTALL/source.properties"
+
 (cd "$INSTALL" && zip -FSry "$DEST/cmake-${OS}-${BNUM}.zip" .)
