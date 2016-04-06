@@ -87,7 +87,7 @@ case "$OS" in
         ;;
     windows)
         CMAKE=(env PATH=$(cygpath --unix 'C:\Windows\System32')
-               cmd /c "${VS120COMNTOOLS}VsDevCmd.bat" '&&' "${CMAKE[@]}")
+               cmd /c "${VS140COMNTOOLS}VsDevCmd.bat" '&&' "${CMAKE[@]}")
         ;;
 esac
 
