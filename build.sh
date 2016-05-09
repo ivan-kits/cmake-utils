@@ -86,6 +86,8 @@ case "$OS" in
     darwin)
         ;;
     windows)
+        CMAKE_OPTIONS+=(-DCMAKE_C_FLAGS_RELEASE=/MT)
+        CMAKE_OPTIONS+=(-DCMAKE_CXX_FLAGS_RELEASE=/MT)
         CMAKE=(env PATH=$(cygpath --unix 'C:\Windows\System32')
                cmd /c "${VS140COMNTOOLS}VsDevCmd.bat" '&&' "${CMAKE[@]}")
         ;;
