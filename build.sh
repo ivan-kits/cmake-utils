@@ -119,7 +119,7 @@ install -m 644 "$ANDROID_CMAKE/"*.cmake "$INSTALL/"
 # Use the last column of first line of cmake --version for revision number:
 # cmake version x.y.z
 REVISION=$("$INSTALL/bin/cmake" --version | awk 'NR==1{print $NF}')
-echo "Pkg.Revision=$REVISION" > "$INSTALL/source.properties"
+echo "Pkg.Revision=$REVISION.$BNUM" > "$INSTALL/source.properties"
 
 # TODO: remove this when we change install location
 cp -a "$INSTALL" "$INSTALL-$REVISION"
