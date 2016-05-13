@@ -121,4 +121,8 @@ install -m 644 "$ANDROID_CMAKE/"*.cmake "$INSTALL/"
 REVISION=$("$INSTALL/bin/cmake" --version | awk 'NR==1{print $NF}')
 echo "Pkg.Revision=$REVISION" > "$INSTALL/source.properties"
 
+# TODO: remove this when we change install location
+cp -a "$INSTALL" "$INSTALL-$REVISION"
+mv "$INSTALL-$REVISION" "$INSTALL/$REVISION"
+
 (cd "$INSTALL" && zip -FSry "$DEST/cmake-${OS}-${BNUM}.zip" .)
