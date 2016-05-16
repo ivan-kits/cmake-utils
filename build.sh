@@ -118,7 +118,12 @@ install -m 644 "$ANDROID_CMAKE/"*.cmake "$INSTALL/"
 
 # Use the last column of first line of cmake --version for revision number:
 # cmake version x.y.z
-REVISION=$("$INSTALL/bin/cmake" --version | awk 'NR==1{print $NF}')
+# then grab the major and minor versions:
+# x.y
+REVISION=$("$INSTALL/bin/cmake" --version |
+           awk 'NR==1{print $NF}' |
+           grep --only-matching '^[0-9]\+\.[0-9]\+')
+# Use the build number for the micro version
 echo "Pkg.Revision=$REVISION.$BNUM" > "$INSTALL/source.properties"
 
 # TODO: remove this when we change install location
