@@ -126,8 +126,4 @@ REVISION=$("$INSTALL/bin/cmake" --version |
 # Use the build number for the micro version
 echo "Pkg.Revision=$REVISION.$BNUM" > "$INSTALL/source.properties"
 
-# TODO: remove this when we change install location
-cp -a "$INSTALL" "$INSTALL-$REVISION"
-mv "$INSTALL-$REVISION" "$INSTALL/$REVISION"
-
 (cd "$INSTALL" && zip -FSry "$DEST/cmake-${OS}-${BNUM}.zip" .)
