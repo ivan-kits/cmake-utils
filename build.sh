@@ -34,7 +34,7 @@ OUT=$(cd "$OUT" && pwd -P)
 DEST=$(cd "$DEST" && pwd -P)
 
 cat <<END_INFO
-## Building android-studio ##
+## Building CMake ##
 ## Out Dir  : $OUT
 ## Dest Dir : $DEST
 ## Build Num: $BNUM
