@@ -80,8 +80,6 @@ case "$OS" in
         CMAKE_OPTIONS+=(-DCMAKE_USE_OPENSSL=ON)
         OPENSSL=$ROOT_DIR/external/openssl
         CMAKE_OPTIONS+=(-DOPENSSL_INCLUDE_DIR="$OPENSSL/include")
-        CA_PATH=$ROOT_DIR/system/ca-certificates/files
-        CMAKE_OPTIONS+=(-DCURL_CA_PATH="$CA_PATH")
         ;;
     darwin)
         ;;
