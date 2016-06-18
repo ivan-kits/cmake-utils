@@ -112,7 +112,6 @@ case "$OS" in
         install "$NINJA" "$INSTALL/bin/"
         ;;
 esac
-install -m 644 "$ANDROID_CMAKE/"*.cmake "$INSTALL/"
 
 # Use the last column of first line of cmake --version for revision number:
 # cmake version x.y.z
@@ -123,5 +122,9 @@ REVISION=$("$INSTALL/bin/cmake" --version |
            grep --only-matching '^[0-9]\+\.[0-9]\+')
 # Use the build number for the micro version
 echo "Pkg.Revision=$REVISION.$BNUM" > "$INSTALL/source.properties"
+
+install -m 644 "$CMAKE_UTILS/android.toolchain.cmake"   "$INSTALL/"
+install -m 644 "$ANDROID_CMAKE/AndroidNdkModules.cmake" "$INSTALL/share/cmake-$REVISION/Modules/"
+install -m 644 "$ANDROID_CMAKE/AndroidNdkGdb.cmake"     "$INSTALL/share/cmake-$REVISION/Modules/"
 
 (cd "$INSTALL" && zip -FSry "$DEST/cmake-${OS}-${BNUM}.zip" .)
