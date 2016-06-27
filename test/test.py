@@ -46,7 +46,7 @@ class TestToolchainFile(unittest.TestCase):
                          msg='\n%s\n%s\n%s' %
                          (str.join(' ', command), stdout, stderr))
 
-    def compile_cmake(self, target):
+    def compile_cmake(self):
         command = [cmake,
                    '-H%s' % project,
                    '-B%s' % self.cmake_build,
@@ -60,10 +60,10 @@ class TestToolchainFile(unittest.TestCase):
                    '-DANDROID_STL=%s' % self.stl,
                    '-DCMAKE_BUILD_TYPE=%s' % self.build_type]
         self.run_and_assert_success(command)
-        command = [cmake, '--build', self.cmake_build, '--target', target]
+        command = [cmake, '--build', self.cmake_build]
         self.run_and_assert_success(command)
 
-    def compile_ndk(self, target):
+    def compile_ndk(self):
         toolchain = self.toolchain
         if toolchain == 'gcc':
             toolchain = '4.9'
@@ -72,7 +72,6 @@ class TestToolchainFile(unittest.TestCase):
         else:
             ldflags = ''
         command = [ndk_build,
-                   target,
                    '-C', project,
                    'NDK_TOOLCHAIN_VERSION=%s' % toolchain,
                    'APP_ABI=%s' % self.abi,
@@ -86,12 +85,8 @@ class TestToolchainFile(unittest.TestCase):
 
     def compare(self):
         self.make_build_directories()
-        if self.stl in ['none', 'system']:
-            target = 'c_exe'
-        else:
-            target = 'all'
-        self.compile_cmake(target)
-        # self.compile_ndk(target)
+        self.compile_cmake()
+        # self.compile_ndk()
         # TODO: compare the build output or build artifacts
 
 
