@@ -121,7 +121,11 @@ REVISION=$("$INSTALL/bin/cmake" --version |
            awk 'NR==1{print $NF}' |
            grep --only-matching '^[0-9]\+\.[0-9]\+')
 # Use the build number for the micro version
-echo "Pkg.Revision=$REVISION.$BNUM" > "$INSTALL/source.properties"
+cat > "$INSTALL/source.properties" <<EOF
+Pkg.Revision=$REVISION.$BNUM
+Pkg.Desc=CMake $REVISION
+Extra.Path=cmake
+EOF
 
 install -m 644 "$CMAKE_UTILS/android.toolchain.cmake"   "$INSTALL/"
 install -m 644 "$ANDROID_CMAKE/AndroidNdkModules.cmake" "$INSTALL/share/cmake-$REVISION/Modules/"
