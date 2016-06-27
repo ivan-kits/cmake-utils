@@ -121,10 +121,11 @@ REVISION=$("$INSTALL/bin/cmake" --version |
            awk 'NR==1{print $NF}' |
            grep --only-matching '^[0-9]\+\.[0-9]\+')
 # Use the build number for the micro version
+# TODO: change Pkg.Path to cmake;$REVISION after preview 4 is available
 cat > "$INSTALL/source.properties" <<EOF
 Pkg.Revision=$REVISION.$BNUM
 Pkg.Desc=CMake $REVISION
-Extra.Path=cmake
+Pkg.Path=cmake
 EOF
 
 install -m 644 "$CMAKE_UTILS/android.toolchain.cmake"   "$INSTALL/"
