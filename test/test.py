@@ -56,48 +56,59 @@ class TestCMake(unittest.TestCase):
         self.assertEqual(abi, self.abi)
         self.assertEqual(value['abi'], abi)
         self.assertEqual(value['artifactName'], name)
-        self.assertEqual(value['buildCommand'],
-                         '%s --build %s --target %s' %
-                         (cmake, self.cmake_build, name))
         self.assertEqual(value['buildType'], build_type)
-        files = value['files']
-        self.assertEqual(len(files), 1)
-        flags = files[0]['flags']
-        self.assertTrue(flags)
-        tokenized_flags = shlex.split(flags)
-        self.assertTrue('-DANDROID' in tokenized_flags)
-        self.assertEqual('-DNONE' in tokenized_flags,
-                         self.stl == 'none')
-        self.assertEqual('-DSYSTEM' in tokenized_flags,
-                         self.stl == 'system')
-        self.assertEqual('-DNEON' in tokenized_flags,
-                         self.abi == 'armeabi-v7a' and
-                         name.startswith('neon_'))
-        split_name = name.split('_', 2)
-        if 'neon' in split_name:
-            self.assertEqual(len(split_name), 3)
-            split_name.remove('neon')
-        self.assertEqual(len(split_name), 2)
-        split_name.reverse()
-        source = '.'.join(split_name)
-        if 'exe' not in split_name:
-            source = os.path.join(split_name[0], source)
-        source = os.path.join(project, source)
-        self.assertEqual(files[0]['src'], source)
-        self.assertEqual(files[0]['workingDirectory'], self.cmake_build)
-        if name.endswith('_exe'):
-            output = name
-        elif name.endswith('_shared'):
-            output = 'lib%s.so' % name
-        elif name.endswith('_static'):
-            output = 'lib%s.a' % name
-        self.assertEqual(value['output'],
-                         os.path.join(self.cmake_build, output))
+        if name in ['missing', 'imported']:
+            self.assertFalse('buildCommand' in value)
+            self.assertFalse('files' in value)
+        else:
+            self.assertEqual(value['buildCommand'],
+                             '%s --build %s --target %s' %
+                             (cmake, self.cmake_build, name))
+            files = value['files']
+            self.assertEqual(len(files), 1)
+            flags = files[0]['flags']
+            self.assertTrue(flags)
+            tokenized_flags = shlex.split(flags)
+            self.assertTrue('-DANDROID' in tokenized_flags)
+            self.assertEqual('-DNONE' in tokenized_flags,
+                             self.stl == 'none')
+            self.assertEqual('-DSYSTEM' in tokenized_flags,
+                             self.stl == 'system')
+            self.assertEqual('-DNEON' in tokenized_flags,
+                             self.abi == 'armeabi-v7a' and
+                             name.startswith('neon_'))
+            split_name = name.split('_', 2)
+            if 'neon' in split_name:
+                self.assertEqual(len(split_name), 3)
+                split_name.remove('neon')
+            self.assertEqual(len(split_name), 2)
+            split_name.reverse()
+            source = '.'.join(split_name)
+            if 'exe' not in split_name:
+                source = os.path.join(split_name[0], source)
+            source = os.path.join(project, source)
+            self.assertEqual(files[0]['src'], source)
+            self.assertEqual(files[0]['workingDirectory'], self.cmake_build)
+        if name == 'missing':
+            self.assertFalse('output' in value)
+        elif name == 'imported':
+            self.assertEqual(value['output'],
+                             '/fake/location/libimported.so')
+        else:
+            if name.endswith('_exe'):
+                output = name
+            elif name.endswith('_shared'):
+                output = 'lib%s.so' % name
+            elif name.endswith('_static'):
+                output = 'lib%s.a' % name
+            self.assertEqual(value['output'],
+                             os.path.join(self.cmake_build, output))
         self.assertEqual(value['toolchain'], toolchain_key)
 
     def check_json(self, json_file):
         json_obj = json.load(open(json_file))
-        libraries = ['c_exe', 'c_shared', 'c_static', 'cpp_exe']
+        libraries = ['c_exe', 'c_shared', 'c_static', 'cpp_exe',
+                     'missing', 'imported']
         c_file_extensions = ['c']
         cpp_file_extensions = ['cpp']
         if self.stl not in ['none', 'system']:

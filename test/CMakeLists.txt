@@ -31,3 +31,8 @@ if(ANDROID_ABI STREQUAL armeabi-v7a)
 	set_target_properties(neon_cpp_exe PROPERTIES
 		COMPILE_FLAGS "-DNEON -mfpu=neon")
 endif()
+
+add_library(missing SHARED IMPORTED)
+add_library(imported SHARED IMPORTED)
+set_target_properties(imported PROPERTIES
+	IMPORTED_LOCATION /fake/location/libimported.so)
