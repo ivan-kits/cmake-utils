@@ -108,7 +108,8 @@ class TestCMake(unittest.TestCase):
     def check_json(self, json_file):
         json_obj = json.load(open(json_file))
         libraries = ['c_exe', 'c_shared', 'c_static', 'cpp_exe',
-                     'missing', 'imported']
+                     # 'missing', 'imported']
+                     ]
         c_file_extensions = ['c']
         cpp_file_extensions = ['cpp']
         if self.stl not in ['none', 'system']:
