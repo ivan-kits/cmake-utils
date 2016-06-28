@@ -19,3 +19,15 @@ target_link_libraries(c_exe ${C_LIBRARIES})
 
 add_executable(cpp_exe exe.cpp)
 target_link_libraries(cpp_exe ${C_LIBRARIES} ${CPP_LIBRARIES})
+
+if(ANDROID_ABI STREQUAL armeabi-v7a)
+	add_executable(neon_c_exe exe.c)
+	target_link_libraries(neon_c_exe ${C_LIBRARIES})
+	set_target_properties(neon_c_exe PROPERTIES
+		COMPILE_FLAGS "-DNEON -mfpu=neon")
+
+	add_executable(neon_cpp_exe exe.cpp)
+	target_link_libraries(neon_cpp_exe ${C_LIBRARIES} ${CPP_LIBRARIES})
+	set_target_properties(neon_cpp_exe PROPERTIES
+		COMPILE_FLAGS "-DNEON -mfpu=neon")
+endif()
