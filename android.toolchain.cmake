@@ -250,7 +250,7 @@ elseif(ANDROID_ABI STREQUAL mips64)
 	set(ANDROID_TOOLCHAIN_ROOT ${ANDROID_TOOLCHAIN_NAME})
 	set(ANDROID_LLVM_TRIPLE mips64el-none-linux-android)
 else()
-	message(SEND_ERROR "Invalid Android ABI: ${ANDROID_ABI}.")
+	message(FATAL_ERROR "Invalid Android ABI: ${ANDROID_ABI}.")
 endif()
 
 # STL.
@@ -289,7 +289,7 @@ elseif(ANDROID_STL STREQUAL c++_shared)
 		c++_shared)
 elseif(ANDROID_STL STREQUAL none)
 else()
-	message(SEND_ERROR "Invalid Android STL: ${ANDROID_STL}.")
+	message(FATAL_ERROR "Invalid Android STL: ${ANDROID_STL}.")
 endif()
 
 # Sysroot.
@@ -329,20 +329,32 @@ elseif(ANDROID_TOOLCHAIN STREQUAL gcc)
 	set(ANDROID_C_COMPILER   "${ANDROID_TOOLCHAIN_PREFIX}gcc${ANDROID_TOOLCHAIN_SUFFIX}")
 	set(ANDROID_CXX_COMPILER "${ANDROID_TOOLCHAIN_PREFIX}g++${ANDROID_TOOLCHAIN_SUFFIX}")
 else()
-	message(SEND_ERROR "Invalid Android toolchain: ${ANDROID_TOOLCHAIN}.")
+	message(FATAL_ERROR "Invalid Android toolchain: ${ANDROID_TOOLCHAIN}.")
 endif()
 
-# Check that the directory structures are valid.
+# Check that the NDK is valid.
 if(NOT IS_DIRECTORY "${ANDROID_NDK}"
 		OR NOT IS_DIRECTORY "${ANDROID_NDK}/platforms"
 		OR NOT IS_DIRECTORY "${ANDROID_NDK}/prebuilt"
 		OR NOT IS_DIRECTORY "${ANDROID_NDK}/sources"
 		OR NOT IS_DIRECTORY "${ANDROID_NDK}/toolchains")
-	message(SEND_ERROR "Invalid Android NDK: ${ANDROID_NDK}.")
+	message(FATAL_ERROR "Invalid Android NDK: ${ANDROID_NDK}.")
 elseif(NOT IS_DIRECTORY "${ANDROID_NDK}/platforms/${ANDROID_PLATFORM}")
-	message(SEND_ERROR "Invalid Android platform: ${ANDROID_PLATFORM}.")
+	message(FATAL_ERROR "Invalid Android platform: ${ANDROID_PLATFORM}.")
 elseif(NOT IS_DIRECTORY "${CMAKE_SYSROOT}")
-	message(SEND_ERROR "Invalid Android ABI for platform ${ANDROID_PLATFORM}: ${ANDROID_ABI}.")
+	message(FATAL_ERROR "Invalid Android ABI for platform ${ANDROID_PLATFORM}: ${ANDROID_ABI}.")
+endif()
+set(ANDROID_NDK_REVISION 12)
+file(READ "${ANDROID_NDK}/source.properties" ANDROID_NDK_SOURCE_PROPERTIES)
+set(ANDROID_NDK_SOURCE_PROPERTIES_REGEX
+	"^Pkg\\.Desc = Android NDK\nPkg\\.Revision = ([0-9]+\\.[0-9]+\\.[0-9]+(-beta[0-9]+)?)\n$")
+if(NOT ANDROID_NDK_SOURCE_PROPERTIES MATCHES "${ANDROID_NDK_SOURCE_PROPERTIES_REGEX}")
+	message(FATAL_ERROR "Failed to parse Android NDK revision: ${ANDROID_NDK}/source.properties.")
+endif()
+string(REGEX REPLACE "${ANDROID_NDK_SOURCE_PROPERTIES_REGEX}" "\\1"
+	ANDROID_NDK_PACKAGE_REVISION "${ANDROID_NDK_SOURCE_PROPERTIES}")
+if(NOT ANDROID_NDK_PACKAGE_REVISION MATCHES "^${ANDROID_NDK_REVISION}\\.")
+	message(FATAL_ERROR "Invalid Android NDK revision (should be ${ANDROID_NDK_REVISION}): ${ANDROID_NDK_PACKAGE_REVISION}.")
 endif()
 
 set(ANDROID_COMPILER_FLAGS)
@@ -363,11 +375,6 @@ list(APPEND ANDROID_COMPILER_FLAGS
 list(APPEND ANDROID_COMPILER_FLAGS_CXX
 	-fno-exceptions
 	-fno-rtti)
-list(APPEND ANDROID_COMPILER_FLAGS_DEBUG
-	-O0
-	-UNDEBUG)
-list(APPEND ANDROID_COMPILER_FLAGS_RELEASE
-	-DNDEBUG)
 list(APPEND ANDROID_LINKER_FLAGS
 	-Wl,--build-id
 	-Wl,--warn-shared-textrel
@@ -376,14 +383,24 @@ list(APPEND ANDROID_LINKER_FLAGS_EXE
 	-Wl,--gc-sections
 	-Wl,-z,nocopyreloc)
 
-# Toolchain and ABI specific flags.
+# Debug and release flags.
+list(APPEND ANDROID_COMPILER_FLAGS_DEBUG
+	-O0)
+if(ANDROID_ABI MATCHES "^armeabi")
+	list(APPEND ANDROID_COMPILER_FLAGS_RELEASE
+		-Os)
+else()
+	list(APPEND ANDROID_COMPILER_FLAGS_RELEASE
+		-O2)
+endif()
+list(APPEND ANDROID_COMPILER_FLAGS_RELEASE
+	-DNDEBUG)
 if(ANDROID_TOOLCHAIN STREQUAL clang)
-	list(APPEND ANDROID_COMPILER_FLAGS
-		-Wno-invalid-command-line-argument
-		-Wno-unused-command-line-argument)
 	list(APPEND ANDROID_COMPILER_FLAGS_DEBUG
 		-fno-limit-debug-info)
 endif()
+
+# Toolchain and ABI specific flags.
 if(ANDROID_ABI STREQUAL armeabi)
 	list(APPEND ANDROID_COMPILER_FLAGS
 		-march=armv5te
@@ -398,25 +415,10 @@ if(ANDROID_ABI STREQUAL armeabi-v7a)
 	list(APPEND ANDROID_LINKER_FLAGS
 		-Wl,--fix-cortex-a8)
 endif()
-if(ANDROID_ABI MATCHES "^armeabi")
-	list(APPEND ANDROID_COMPILER_FLAGS_RELEASE
-		-Os)
-else()
-	list(APPEND ANDROID_COMPILER_FLAGS_RELEASE
-		-O2)
-endif()
-if(ANDROID_ABI MATCHES "^mips")
-	list(APPEND ANDROID_COMPILER_FLAGS
-		-finline-functions)
-endif()
 if(ANDROID_ABI MATCHES "^armeabi" AND ANDROID_TOOLCHAIN STREQUAL clang)
 	# Disable integrated-as for better compatibility.
 	list(APPEND ANDROID_COMPILER_FLAGS
 		-fno-integrated-as)
-endif()
-if(ANDROID_ABI MATCHES "^mips" AND ANDROID_TOOLCHAIN STREQUAL clang)
-	list(APPEND ANDROID_COMPILER_FLAGS
-		-fno-inline-functions-called-once)
 endif()
 if(ANDROID_ABI STREQUAL mips AND ANDROID_TOOLCHAIN STREQUAL clang)
 	list(APPEND ANDROID_COMPILER_FLAGS
@@ -490,7 +492,7 @@ if(ANDROID_CPP_FEATURES)
 	separate_arguments(ANDROID_CPP_FEATURES)
 	foreach(feature ${ANDROID_CPP_FEATURES})
 		if(NOT ${feature} MATCHES "^(rtti|exceptions)$")
-			message(SEND_ERROR "Invalid Android C++ feature: ${feature}.")
+			message(FATAL_ERROR "Invalid Android C++ feature: ${feature}.")
 		endif()
 		list(APPEND ANDROID_COMPILER_FLAGS_CXX
 			-f${feature})
@@ -509,7 +511,7 @@ if(ANDROID_ABI MATCHES "armeabi")
 		list(APPEND ANDROID_COMPILER_FLAGS
 			-marm)
 	else()
-		message(SEND_ERROR "Invalid Android ARM mode: ${ANDROID_ARM_MODE}.")
+		message(FATAL_ERROR "Invalid Android ARM mode: ${ANDROID_ARM_MODE}.")
 	endif()
 	if(ANDROID_STL STREQUAL armeabi-v7a AND ANDROID_ARM_NEON)
 		list(APPEND ANDROID_COMPILER_FLAGS
@@ -561,7 +563,7 @@ else()
 endif()
 set(CMAKE_AR                  "${ANDROID_TOOLCHAIN_PREFIX}gcc-ar${ANDROID_TOOLCHAIN_SUFFIX}"  CACHE FILEPATH "ar")
 set(CMAKE_ASM_COMPILER        "${ANDROID_TOOLCHAIN_PREFIX}gcc${ANDROID_TOOLCHAIN_SUFFIX}"     CACHE FILEPATH "asm compiler")
-set(CMAKE_LINKER              "${ANDROID_TOOLCHAIN_PREFIX}ld.gold${ANDROID_TOOLCHAIN_SUFFIX}" CACHE FILEPATH "linker")
+set(CMAKE_LINKER              "${ANDROID_TOOLCHAIN_PREFIX}ld${ANDROID_TOOLCHAIN_SUFFIX}"      CACHE FILEPATH "linker")
 set(CMAKE_NM                  "${ANDROID_TOOLCHAIN_PREFIX}nm${ANDROID_TOOLCHAIN_SUFFIX}"      CACHE FILEPATH "nm")
 set(CMAKE_OBJCOPY             "${ANDROID_TOOLCHAIN_PREFIX}objcopy${ANDROID_TOOLCHAIN_SUFFIX}" CACHE FILEPATH "objcopy")
 set(CMAKE_OBJDUMP             "${ANDROID_TOOLCHAIN_PREFIX}objdump${ANDROID_TOOLCHAIN_SUFFIX}" CACHE FILEPATH "objdump")
@@ -644,7 +646,7 @@ elseif(ANDROID_ABI STREQUAL MIPS64)
 endif()
 set(ANDROID_NDK_HOST_SYSTEM_NAME ${ANDROID_HOST_TAG})
 set(ANDROID_NDK_ABI_NAME ${ANDROID_ABI})
-set(ANDROID_NDK_RELEASE r12)
+set(ANDROID_NDK_RELEASE r${ANDROID_NDK_REVISION})
 set(ANDROID_ARCH_NAME ${ANDROID_SYSROOT_ABI})
 set(ANDROID_SYSROOT "${CMAKE_SYSROOT}")
 set(TOOL_OS_SUFFIX ${ANDROID_TOOLCHAIN_SUFFIX})
