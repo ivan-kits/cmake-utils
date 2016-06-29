@@ -23,6 +23,11 @@ ninja = os.path.join(cmake_root, 'bin', 'ninja')
 toolchain_file = os.path.join(cmake_root, 'android.toolchain.cmake')
 ndk_build = os.path.join(ndk, 'ndk-build')
 
+if os.name == 'nt':
+    cmake += '.exe'
+    ninja += '.exe'
+    ndk_build += '.cmd'
+
 
 class TestCMake(unittest.TestCase):
     def make_build_directories(self):
@@ -47,6 +52,28 @@ class TestCMake(unittest.TestCase):
         self.assertEqual(popen.wait(), 0,
                          msg='\n%s\n%s\n%s' %
                          (str.join(' ', command), stdout, stderr))
+
+    def assertPathEqual(self, path1, path2):
+        if os.altsep:
+            path1 = path1.replace(os.altsep, os.sep)
+            path2 = path2.replace(os.altsep, os.sep)
+        return self.assertEqual(path1, path2)
+
+    def assertPathStartsWith(self, path1, path2):
+        if os.altsep:
+            path1 = path1.replace(os.altsep, os.sep)
+            path2 = path2.replace(os.altsep, os.sep)
+        return self.assertTrue(path1.startswith(path2))
+
+    def check_json_library_output(self, name, json_output):
+        if name.endswith('_exe'):
+            output = name
+        elif name.endswith('_shared'):
+            output = 'lib%s.so' % name
+        elif name.endswith('_static'):
+            output = 'lib%s.a' % name
+        self.assertPathEqual(json_output,
+                             os.path.join(self.cmake_build, output))
 
     def check_json_library(self, key, value, toolchain_key):
         split_key = key.split('-', 2)
@@ -87,22 +114,16 @@ class TestCMake(unittest.TestCase):
             if 'exe' not in split_name:
                 source = os.path.join(split_name[0], source)
             source = os.path.join(project, source)
-            self.assertEqual(files[0]['src'], source)
-            self.assertEqual(files[0]['workingDirectory'], self.cmake_build)
+            self.assertPathEqual(files[0]['src'], source)
+            self.assertPathEqual(files[0]['workingDirectory'],
+                                 self.cmake_build)
         if name == 'missing':
             self.assertFalse('output' in value)
         elif name == 'imported':
             self.assertEqual(value['output'],
                              '/fake/location/libimported.so')
         else:
-            if name.endswith('_exe'):
-                output = name
-            elif name.endswith('_shared'):
-                output = 'lib%s.so' % name
-            elif name.endswith('_static'):
-                output = 'lib%s.a' % name
-            self.assertEqual(value['output'],
-                             os.path.join(self.cmake_build, output))
+            self.check_json_library_output(name, value['output'])
         self.assertEqual(value['toolchain'], toolchain_key)
 
     def check_json(self, json_file):
@@ -116,8 +137,9 @@ class TestCMake(unittest.TestCase):
             libraries += ['cpp_shared', 'cpp_static']
         if self.abi == 'armeabi-v7a':
             libraries += ['neon_c_exe', 'neon_cpp_exe']
-        self.assertEqual(json_obj['buildFiles'],
-                         [os.path.join(project, 'CMakeLists.txt')])
+        self.assertEqual(len(json_obj['buildFiles']), 1)
+        self.assertPathEqual(json_obj['buildFiles'][0],
+                             os.path.join(project, 'CMakeLists.txt'))
         self.assertEqual(json_obj['cFileExtensions'],
                          c_file_extensions)
         self.assertEqual(json_obj['cppFileExtensions'],
@@ -128,11 +150,12 @@ class TestCMake(unittest.TestCase):
         self.assertEqual(len(json_obj['toolchains']), 1)
         toolchain_key = json_obj['toolchains'].keys()[0]
         toolchain = json_obj['toolchains'].values()[0]
-        self.assertTrue(toolchain['cCompilerExecutable'].startswith(
-            os.path.join(ndk, 'toolchains')))
-        self.assertTrue(toolchain['cppCompilerExecutable'].startswith(
-            os.path.join(ndk, 'toolchains')))
-        self.assertTrue(toolchain['cppCompilerExecutable'].endswith('++'))
+        self.assertPathStartsWith(toolchain['cCompilerExecutable'],
+                                  os.path.join(ndk, 'toolchains'))
+        self.assertPathStartsWith(toolchain['cppCompilerExecutable'],
+                                  os.path.join(ndk, 'toolchains'))
+        self.assertTrue(toolchain['cppCompilerExecutable'].endswith('++') or
+                        toolchain['cppCompilerExecutable'].endswith('++.exe'))
         self.assertEqual(len(json_obj['libraries']), len(libraries))
         for library in libraries:
             key = '%s-%s-%s' % (library, self.build_type, self.abi)
