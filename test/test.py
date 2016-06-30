@@ -202,6 +202,24 @@ class TestCMake(unittest.TestCase):
                    'APP_LDFLAGS=%s' % ldflags]
         self.run_and_assert_success(command)
 
+    def test_response_file(self):
+        build = os.path.join(tmp, 'response_file')
+        if os.path.isdir(build):
+            shutil.rmtree(build)
+        os.makedirs(build)
+
+        command = [cmake,
+                   '-H%s' % project,
+                   '-B%s' % build,
+                   '-GAndroid Gradle - Ninja',
+                   '-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_file,
+                   '-DCMAKE_MAKE_PROGRAM=%s' % ninja,
+                   '-DANDROID_NDK=%s' % ndk,
+                   '-DCMAKE_NINJA_FORCE_RESPONSE_FILE=TRUE']
+        self.run_and_assert_success(command)
+        command = [cmake, '--build', build]
+        self.run_and_assert_success(command)
+
     def compare(self):
         self.make_build_directories()
         self.compile_cmake()

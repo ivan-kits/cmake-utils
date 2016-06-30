@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.4.1)
 
+# Silence unused variable warning.
+if(CMAKE_NINJA_FORCE_RESPONSE_FILE)
+endif()
+
 add_library(c_shared SHARED shared/shared.c)
 add_library(c_static STATIC static/static.c)
 set(C_LIBRARIES c_shared c_static)
