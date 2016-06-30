@@ -186,7 +186,7 @@ class TestCMake(unittest.TestCase):
         toolchain = self.toolchain
         if toolchain == 'gcc':
             toolchain = '4.9'
-        if self.stl == 'c++_static' and self.abi == 'armeabi':
+        if self.abi == 'armeabi':
             ldflags = '-latomic'
         else:
             ldflags = ''

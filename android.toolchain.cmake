@@ -256,7 +256,6 @@ endif()
 # STL.
 set(ANDROID_STL_STATIC_LIBRARIES)
 set(ANDROID_STL_SHARED_LIBRARIES)
-set(ANDROID_STL_LDLIBS)
 if(ANDROID_STL STREQUAL system)
 	set(ANDROID_STL_STATIC_LIBRARIES
 		supc++)
@@ -280,8 +279,6 @@ elseif(ANDROID_STL STREQUAL c++_static)
 		c++abi
 		unwind
 		android_support)
-	set(ANDROID_STL_LDLIBS
-		-latomic)
 elseif(ANDROID_STL STREQUAL c++_shared)
 	set(ANDROID_STL_STATIC_LIBRARIES
 		unwind)
@@ -447,12 +444,8 @@ elseif(ANDROID_STL MATCHES "^c\\+\\+_")
 		list(APPEND ANDROID_LINKER_FLAGS
 			-Wl,--exclude-libs,libunwind.a)
 	else()
-		if(ANDROID_STL_STATIC_LIBRARIES)
-			list(REMOVE_ITEM ANDROID_STL_STATIC_LIBRARIES unwind)
-		endif()
-		if(ANDROID_STL_LDLIBS)
-			list(REMOVE_ITEM ANDROID_STL_LDLIBS -latomic)
-		endif()
+		list(REMOVE_ITEM ANDROID_STL_STATIC_LIBRARIES
+			unwind)
 	endif()
 	list(APPEND ANDROID_COMPILER_FLAGS_CXX
 		-std=c++11)
@@ -474,10 +467,10 @@ foreach(library ${ANDROID_STL_SHARED_LIBRARIES})
 	list(APPEND ANDROID_CXX_STANDARD_LIBRARIES
 		"${ANDROID_NDK}/sources/cxx-stl/${ANDROID_STL_PREFIX}/libs/${ANDROID_ABI}/lib${library}.so")
 endforeach()
-foreach(library ${ANDROID_STL_LDLIBS})
+if(ANDROID_ABI STREQUAL armeabi AND NOT ANDROID_STL MATCHES "^(none|system)$")
 	list(APPEND ANDROID_CXX_STANDARD_LIBRARIES
-		${library})
-endforeach()
+		-latomic)
+endif()
 string(REPLACE ";" " " ANDROID_CXX_STANDARD_LIBRARIES "${ANDROID_CXX_STANDARD_LIBRARIES}")
 set(CMAKE_CXX_STANDARD_LIBRARIES "${ANDROID_CXX_STANDARD_LIBRARIES}")
 
