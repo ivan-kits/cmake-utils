@@ -30,3 +30,18 @@ int main() {
 }
 
 #endif
+
+#include <stdlib.h>
+#include <math.h>
+#include <dlfcn.h>
+
+void link() {
+	// Test if libm is linked.
+	double sin_zero = sin(0.0);
+
+	// Test if libdl is linked.
+	const char *error = dlerror();
+
+	// Test if libc is linked.
+	printf("%lf %s\n", sin_zero, error);
+}
