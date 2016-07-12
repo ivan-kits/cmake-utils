@@ -101,7 +101,7 @@ CMAKE_OPTIONS+=(-DCMAKE_INSTALL_PREFIX=)
 "${CMAKE[@]}" --build "$BUILD"
 # TODO: fix tests on the builders
 # mostly caused by non-standard generator and compiler locations
-# "${CMAKE[@]}" --build "$BUILD" --target test
+"${CMAKE[@]}" --build "$BUILD" --target test || true
 DESTDIR="$INSTALL" "${CMAKE[@]}" --build "$BUILD" --target install
 
 case "$OS" in
