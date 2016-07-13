@@ -99,9 +99,6 @@ CMAKE_OPTIONS+=(-DCMAKE_INSTALL_PREFIX=)
 
 (cd $BUILD && "${CMAKE[@]}" "${CMAKE_OPTIONS[@]}")
 "${CMAKE[@]}" --build "$BUILD"
-# TODO: fix tests on the builders
-# mostly caused by non-standard generator and compiler locations
-"${CMAKE[@]}" --build "$BUILD" --target test || true
 DESTDIR="$INSTALL" "${CMAKE[@]}" --build "$BUILD" --target install
 
 case "$OS" in
@@ -132,3 +129,8 @@ install -m 644 "$ANDROID_CMAKE/AndroidNdkModules.cmake" "$INSTALL/share/cmake-$R
 install -m 644 "$ANDROID_CMAKE/AndroidNdkGdb.cmake"     "$INSTALL/share/cmake-$REVISION/Modules/"
 
 (cd "$INSTALL" && zip -FSry "$DEST/cmake-${OS}-${BNUM}.zip" .)
+
+# TODO: fix tests on the builders
+# mostly caused by non-standard generator and compiler locations
+PATH=$INSTALL/bin:$PATH "${CMAKE[@]}" --build "$BUILD" --target test || true
+(cd "$BUILD" && zip -FSry "$DEST/cmake-tests.zip" Tests)
