@@ -136,9 +136,8 @@ case "$OS" in
 				EXCLUDE+=(-E '^RunCMake\.Framework$')
 				;;
 		esac
-		# TODO: remove failsafe after passing.
 		pushd "$BUILD"
-		PATH=$NINJA_DIR:$PATH "$CTEST" --force-new-ctest-process "${EXCLUDE[@]}" || true
+		PATH=$NINJA_DIR:$PATH "$CTEST" --force-new-ctest-process "${EXCLUDE[@]}"
 		popd
 		;;
 	windows)
@@ -149,8 +148,7 @@ case "$OS" in
 		%CTEST% --force-new-ctest-process
 		EOF
 		pushd "$BUILD"
-		# TODO: remove failsafe after passing.
-		cmd /c "$(cygpath --windows "$BUILD/android_test.bat")" || true
+		cmd /c "$(cygpath --windows "$BUILD/android_test.bat")"
 		popd
 		;;
 esac
