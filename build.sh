@@ -109,7 +109,7 @@ install "$NINJA_DIR/ninja"* "$INSTALL/bin/"
 # cmake version x.y.z => x.y
 REVISION=$(
 	"$INSTALL/bin/cmake" --version |
-	awk 'NR==1{match($0, /^cmake version ([0-9]+\.[0-9]+)\./, a); print a[1]}'
+	sed -n 's/^cmake version \([0-9]*\.[0-9]*\)\..*$/\1/p'
 )
 # Use the build number for the micro version
 cat > "$INSTALL/source.properties" <<-EOF
