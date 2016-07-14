@@ -81,7 +81,7 @@ case "$OS" in
 			OPENSSL=$ROOT_DIR/external/openssl
 			CMAKE_OPTIONS+=(-DOPENSSL_INCLUDE_DIR="$OPENSSL/include")
 		fi
-		"$CMAKE" "${CMAKE_OPTIONS[@]}"
+		PATH=$NINJA_DIR:$PATH "$CMAKE" "${CMAKE_OPTIONS[@]}"
 		DESTDIR=$INSTALL "$CMAKE" --build "$BUILD" --target install
 		;;
 	windows)
