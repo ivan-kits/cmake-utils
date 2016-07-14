@@ -105,13 +105,12 @@ esac
 
 install "$NINJA_DIR/ninja"* "$INSTALL/bin/"
 
-# Use the last column of first line of cmake --version for revision number:
-# cmake version x.y.z
-# then grab the major and minor versions:
-# x.y
-REVISION=$("$INSTALL/bin/cmake" --version |
-           awk 'NR==1{print $NF}' |
-           grep --only-matching '^[0-9]\+\.[0-9]\+')
+# Use the major and minor versions from CMake. E.g.,
+# cmake version x.y.z => x.y
+REVISION=$(
+	"$INSTALL/bin/cmake" --version |
+	awk 'NR==1{match($0, /^cmake version ([0-9]+\.[0-9]+)\./, a); print a[1]}'
+)
 # Use the build number for the micro version
 cat > "$INSTALL/source.properties" <<-EOF
 Pkg.Revision=$REVISION.$BNUM
