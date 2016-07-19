@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-import json
 import os
-import shlex
 import shutil
 import subprocess
 import unittest
@@ -53,116 +51,6 @@ class TestCMake(unittest.TestCase):
                          msg='\n%s\n%s\n%s' %
                          (str.join(' ', command), stdout, stderr))
 
-    def assertPathEqual(self, path1, path2):
-        if os.altsep:
-            path1 = path1.replace(os.altsep, os.sep)
-            path2 = path2.replace(os.altsep, os.sep)
-        return self.assertEqual(path1, path2)
-
-    def assertPathStartsWith(self, path1, path2):
-        if os.altsep:
-            path1 = path1.replace(os.altsep, os.sep)
-            path2 = path2.replace(os.altsep, os.sep)
-        return self.assertTrue(path1.startswith(path2))
-
-    def check_json_library_output(self, name, json_output):
-        if name.endswith('_exe'):
-            output = name
-        elif name.endswith('_shared'):
-            output = 'lib%s.so' % name
-        elif name.endswith('_static'):
-            output = 'lib%s.a' % name
-        self.assertPathEqual(json_output,
-                             os.path.join(self.cmake_build, output))
-
-    def check_json_library(self, key, value, toolchain_key):
-        split_key = key.split('-', 2)
-        self.assertEqual(len(split_key), 3)
-        [name, build_type, abi] = split_key
-        self.assertEqual(build_type, self.build_type)
-        self.assertEqual(abi, self.abi)
-        self.assertEqual(value['abi'], abi)
-        self.assertEqual(value['artifactName'], name)
-        self.assertEqual(value['buildType'], build_type)
-        if name in ['missing', 'imported']:
-            self.assertFalse('buildCommand' in value)
-            self.assertFalse('files' in value)
-        else:
-            self.assertEqual(value['buildCommand'],
-                             '%s --build %s --target %s' %
-                             (cmake, self.cmake_build, name))
-            files = value['files']
-            self.assertEqual(len(files), 1)
-            flags = files[0]['flags']
-            self.assertTrue(flags)
-            tokenized_flags = shlex.split(flags)
-            self.assertTrue('-DANDROID' in tokenized_flags)
-            self.assertEqual('-DNONE' in tokenized_flags,
-                             self.stl == 'none')
-            self.assertEqual('-DSYSTEM' in tokenized_flags,
-                             self.stl == 'system')
-            self.assertEqual('-DNEON' in tokenized_flags,
-                             self.abi == 'armeabi-v7a' and
-                             name.startswith('neon_'))
-            split_name = name.split('_', 2)
-            if 'neon' in split_name:
-                self.assertEqual(len(split_name), 3)
-                split_name.remove('neon')
-            self.assertEqual(len(split_name), 2)
-            split_name.reverse()
-            source = '.'.join(split_name)
-            if 'exe' not in split_name:
-                source = os.path.join(split_name[0], source)
-            source = os.path.join(project, source)
-            self.assertPathEqual(files[0]['src'], source)
-            self.assertPathEqual(files[0]['workingDirectory'],
-                                 self.cmake_build)
-        if name == 'missing':
-            self.assertFalse('output' in value)
-        elif name == 'imported':
-            self.assertEqual(value['output'],
-                             '/fake/location/libimported.so')
-        else:
-            self.check_json_library_output(name, value['output'])
-        self.assertEqual(value['toolchain'], toolchain_key)
-
-    def check_json(self, json_file):
-        json_obj = json.load(open(json_file))
-        libraries = ['c_exe', 'c_shared', 'c_static', 'cpp_exe',
-                     # 'missing', 'imported']
-                     ]
-        c_file_extensions = ['c']
-        cpp_file_extensions = ['cpp']
-        if self.stl not in ['none', 'system']:
-            libraries += ['cpp_shared', 'cpp_static']
-        if self.abi == 'armeabi-v7a':
-            libraries += ['neon_c_exe', 'neon_cpp_exe']
-        self.assertEqual(len(json_obj['buildFiles']), 1)
-        self.assertPathEqual(json_obj['buildFiles'][0],
-                             os.path.join(project, 'CMakeLists.txt'))
-        self.assertEqual(json_obj['cFileExtensions'],
-                         c_file_extensions)
-        self.assertEqual(json_obj['cppFileExtensions'],
-                         cpp_file_extensions)
-        self.assertEqual(json_obj['cleanCommands'],
-                         ['%s --build %s --target clean' %
-                          (cmake, self.cmake_build)])
-        self.assertEqual(len(json_obj['toolchains']), 1)
-        toolchain_key = json_obj['toolchains'].keys()[0]
-        toolchain = json_obj['toolchains'].values()[0]
-        self.assertPathStartsWith(toolchain['cCompilerExecutable'],
-                                  os.path.join(ndk, 'toolchains'))
-        self.assertPathStartsWith(toolchain['cppCompilerExecutable'],
-                                  os.path.join(ndk, 'toolchains'))
-        self.assertTrue(toolchain['cppCompilerExecutable'].endswith('++') or
-                        toolchain['cppCompilerExecutable'].endswith('++.exe'))
-        self.assertEqual(len(json_obj['libraries']), len(libraries))
-        for library in libraries:
-            key = '%s-%s-%s' % (library, self.build_type, self.abi)
-            self.assertTrue(key in json_obj['libraries'])
-        for key, value in json_obj['libraries'].iteritems():
-            self.check_json_library(key, value, toolchain_key)
-
     def compile_cmake(self):
         command = [cmake,
                    '-H%s' % project,
@@ -177,8 +65,6 @@ class TestCMake(unittest.TestCase):
                    '-DANDROID_STL=%s' % self.stl,
                    '-DCMAKE_BUILD_TYPE=%s' % self.build_type]
         self.run_and_assert_success(command)
-        json_file = os.path.join(self.cmake_build, 'android_gradle_build.json')
-        self.check_json(json_file)
         command = [cmake, '--build', self.cmake_build]
         self.run_and_assert_success(command)
 
