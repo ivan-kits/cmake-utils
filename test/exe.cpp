@@ -31,9 +31,10 @@ int main() {
 
 #endif
 
-#include <stdlib.h>
-#include <math.h>
 #include <dlfcn.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 void link() {
 	// Test if libm is linked.

@@ -7,9 +7,9 @@ int main() {
 	printf("%s\n", static_get_string());
 }
 
-#include <stdlib.h>
-#include <math.h>
 #include <dlfcn.h>
+#include <math.h>
+#include <stdlib.h>
 
 void link() {
 	// Test if libm is linked.
