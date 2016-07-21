@@ -1,6 +1,3 @@
-#ifndef SHARED_HPP
-#define SHARED_HPP
-
 #include "shared.hpp"
 #include <string>
 
@@ -10,5 +7,3 @@ std::string
 Shared::GetString() {
 	return str;
 }
-
-#endif

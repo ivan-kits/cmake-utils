@@ -1,3 +1,6 @@
+#ifndef SHARED_HPP
+#define SHARED_HPP
+
 #include <string>
 
 class Shared {
@@ -7,3 +10,5 @@ class Shared {
 	private:
 		std::string str;
 };
+
+#endif
