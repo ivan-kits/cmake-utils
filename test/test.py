@@ -128,16 +128,13 @@ def generate_all_tests():
     toolchains = ['clang', 'gcc']
     abis = ['armeabi', 'armeabi-v7a', 'arm64-v8a',
             'x86', 'x86_64', 'mips', 'mips64']
-    platform_levels = [9, 16, 21, 24]
+    platform_levels = [8, 9, 10, 16, 20, 21, 24]
     stls = ['none', 'system', 'stlport_static', 'stlport_shared',
             'gnustl_static', 'gnustl_shared', 'c++_static', 'c++_shared']
     build_types = ['debug', 'release']
     for toolchain in toolchains:
         for abi in abis:
             for platform_level in platform_levels:
-                if (platform_level < 21 and
-                        abi in ['arm64-v8a', 'x86_64', 'mips64']):
-                    continue
                 for stl in stls:
                     for build_type in build_types:
                         platform = 'android-%d' % platform_level
