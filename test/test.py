@@ -55,7 +55,7 @@ class TestCMake(unittest.TestCase):
         command = [cmake,
                    '-H%s' % project,
                    '-B%s' % self.cmake_build,
-                   '-GAndroid Gradle - Ninja',
+                   '-GNinja',
                    '-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_file,
                    '-DCMAKE_MAKE_PROGRAM=%s' % ninja,
                    '-DANDROID_NDK=%s' % ndk,
