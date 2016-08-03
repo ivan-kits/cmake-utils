@@ -4,6 +4,9 @@ cmake_minimum_required(VERSION 3.6.0)
 if(CMAKE_NINJA_FORCE_RESPONSE_FILE)
 endif()
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+
 add_library(c_shared SHARED shared/shared.c)
 add_library(c_static STATIC static/static.c)
 set(C_LIBRARIES c_shared c_static)
