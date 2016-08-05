@@ -8,18 +8,34 @@ import unittest
 project = os.path.realpath(os.path.dirname(__file__))
 repo_root = os.path.realpath(os.path.join(project, '..', '..', '..'))
 
-ndk = os.path.realpath(os.environ.get('ANDROID_NDK_HOME'))
+if 'NDK' in os.environ:
+    ndk = os.environ.get('NDK')
+elif 'ANDROID_NDK_HOME' in os.environ:
+    ndk = os.environ.get('ANDROID_NDK_HOME')
+if not os.path.isdir(ndk):
+    raise Exception('Invalid NDK: %s' % ndk)
+ndk = os.path.realpath(ndk)
 if 'OUT' in os.environ:
     out = os.environ.get('OUT')
 else:
     out = os.path.join(repo_root, 'out')
+if not os.path.isdir(out):
+    raise Exception('Invalid build directory: %s' % out)
 
 tmp = os.path.join(out, 'cmake', 'test')
 cmake_root = os.path.join(out, 'cmake', 'install')
 cmake = os.path.join(cmake_root, 'bin', 'cmake')
 ninja = os.path.join(cmake_root, 'bin', 'ninja')
-toolchain_file = os.path.join(cmake_root, 'android.toolchain.cmake')
 ndk_build = os.path.join(ndk, 'ndk-build')
+
+# toolchain_file = os.path.join(cmake_root, 'android.toolchain.cmake')
+toolchain_file = os.path.join(project, '..', 'android.toolchain.cmake')
+ndk_toolchain_file = os.path.join(ndk, 'build', 'cmake',
+                                  'android.toolchain.cmake')
+if os.path.isfile(ndk_toolchain_file):
+    toolchain_file = ndk_toolchain_file
+if not os.path.isfile(toolchain_file):
+    raise Exception('Invalid toolchain file: %s' % toolchain_file)
 
 if os.name == 'nt':
     cmake += '.exe'
