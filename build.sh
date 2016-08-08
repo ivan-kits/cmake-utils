@@ -136,7 +136,8 @@ case "$OS" in
 				;;
 		esac
 		pushd "$BUILD"
-		PATH=$NINJA_DIR:$PATH "$CTEST" --force-new-ctest-process "${EXCLUDE[@]}"
+		PATH=$NINJA_DIR:$PATH "$CTEST" "${EXCLUDE[@]}" \
+			--force-new-ctest-process --output-on-failure
 		popd
 		;;
 	windows)
@@ -144,7 +145,7 @@ case "$OS" in
 		set PATH=$(cygpath --windows "$NINJA_DIR");C:\\Windows\\System32
 		call "${VS140COMNTOOLS}VsDevCmd.bat"
 		set CTEST=$(cygpath --windows "$CTEST.exe")
-		%CTEST% --force-new-ctest-process
+		%CTEST% --force-new-ctest-process --output-on-failure
 		EOF
 		pushd "$BUILD"
 		cmd /c "$(cygpath --windows "$BUILD/android_test.bat")"
