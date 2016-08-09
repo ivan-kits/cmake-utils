@@ -126,17 +126,8 @@ install -m 644 "$ANDROID_CMAKE/AndroidNdkGdb.cmake"     "$INSTALL/share/cmake-$R
 
 case "$OS" in
 	linux|darwin)
-		# No idea why these fail, skip for now.
-		case "$OS" in
-			linux)
-				EXCLUDE+=(-E '^Qt4Autogen$')
-				;;
-			darwin)
-				EXCLUDE+=(-E '^RunCMake\.Framework$')
-				;;
-		esac
 		pushd "$BUILD"
-		PATH=$NINJA_DIR:$PATH "$CTEST" "${EXCLUDE[@]}" \
+		PATH=$NINJA_DIR:$PATH "$CTEST" \
 			--force-new-ctest-process --output-on-failure
 		popd
 		;;
