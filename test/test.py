@@ -5,8 +5,8 @@ import shutil
 import subprocess
 import unittest
 
-project = os.path.realpath(os.path.dirname(__file__))
-repo_root = os.path.realpath(os.path.join(project, '..', '..', '..'))
+test_root = os.path.realpath(os.path.dirname(__file__))
+repo_root = os.path.realpath(os.path.join(test_root, '..', '..', '..'))
 
 if 'NDK' in os.environ:
     ndk = os.environ.get('NDK')
@@ -29,7 +29,7 @@ ninja = os.path.join(cmake_root, 'bin', 'ninja')
 ndk_build = os.path.join(ndk, 'ndk-build')
 
 # toolchain_file = os.path.join(cmake_root, 'android.toolchain.cmake')
-toolchain_file = os.path.join(project, '..', 'android.toolchain.cmake')
+toolchain_file = os.path.join(test_root, '..', 'android.toolchain.cmake')
 ndk_toolchain_file = os.path.join(ndk, 'build', 'cmake',
                                   'android.toolchain.cmake')
 if os.path.isfile(ndk_toolchain_file):
@@ -68,6 +68,7 @@ class TestCMake(unittest.TestCase):
                          (str.join(' ', command), stdout, stderr))
 
     def compile_cmake(self):
+        project = os.path.join(test_root, 'project')
         command = [cmake,
                    '-H%s' % project,
                    '-B%s' % self.cmake_build,
@@ -85,6 +86,7 @@ class TestCMake(unittest.TestCase):
         self.run_and_assert_success(command)
 
     def compile_ndk(self):
+        project = os.path.join(test_root, 'project')
         toolchain = self.toolchain
         if toolchain == 'gcc':
             toolchain = '4.9'
@@ -105,19 +107,40 @@ class TestCMake(unittest.TestCase):
         self.run_and_assert_success(command)
 
     def test_response_file(self):
+        response_file = os.path.join(test_root, 'response_file')
         build = os.path.join(tmp, 'response_file')
         if os.path.isdir(build):
             shutil.rmtree(build)
         os.makedirs(build)
 
         command = [cmake,
-                   '-H%s' % project,
+                   '-H%s' % response_file,
                    '-B%s' % build,
-                   '-GAndroid Gradle - Ninja',
+                   '-GNinja',
                    '-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_file,
                    '-DCMAKE_MAKE_PROGRAM=%s' % ninja,
                    '-DANDROID_NDK=%s' % ndk,
                    '-DCMAKE_NINJA_FORCE_RESPONSE_FILE=TRUE']
+        self.run_and_assert_success(command)
+        command = [cmake, '--build', build]
+        self.run_and_assert_success(command)
+
+    def test_neon(self):
+        neon = os.path.join(test_root, 'neon')
+        build = os.path.join(tmp, 'neon')
+        if os.path.isdir(build):
+            shutil.rmtree(build)
+        os.makedirs(build)
+
+        command = [cmake,
+                   '-H%s' % neon,
+                   '-B%s' % build,
+                   '-GNinja',
+                   '-DCMAKE_TOOLCHAIN_FILE=%s' % toolchain_file,
+                   '-DCMAKE_MAKE_PROGRAM=%s' % ninja,
+                   '-DANDROID_NDK=%s' % ndk,
+                   '-DANDROID_ABI=armeabi-v7a',
+                   '-DANDROID_ARM_NEON=TRUE']
         self.run_and_assert_success(command)
         command = [cmake, '--build', build]
         self.run_and_assert_success(command)

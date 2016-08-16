@@ -1,9 +1,5 @@
 cmake_minimum_required(VERSION 3.6.0)
 
-# Silence unused variable warning.
-if(CMAKE_NINJA_FORCE_RESPONSE_FILE)
-endif()
-
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Werror")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 
