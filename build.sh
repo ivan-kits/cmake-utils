@@ -126,17 +126,22 @@ install -m 644 "$ANDROID_CMAKE/AndroidNdkGdb.cmake"     "$INSTALL/share/cmake-$R
 
 case "$OS" in
 	linux|darwin)
+		# If a test needs to be skipped:
+		# EXCLUDE+=(-E '<insert test regex>')
 		pushd "$BUILD"
-		PATH=$NINJA_DIR:$PATH "$CTEST" \
+		PATH=$NINJA_DIR:$PATH "$CTEST" "${EXCLUDE[@]}" \
 			--force-new-ctest-process --output-on-failure
 		popd
 		;;
 	windows)
+		# Flaky test.
+		EXCLUDE+=(-E '^CTestTestStopTime$')
 		cat > "$BUILD/android_test.bat" <<-EOF
 		set PATH=$(cygpath --windows "$NINJA_DIR");C:\\Windows\\System32
 		call "${VS140COMNTOOLS}VsDevCmd.bat"
 		set CTEST=$(cygpath --windows "$CTEST.exe")
-		%CTEST% --force-new-ctest-process --output-on-failure
+		%CTEST% $(printf '"%s" ' "${EXCLUDE[@]}") ^
+			--force-new-ctest-process --output-on-failure
 		EOF
 		pushd "$BUILD"
 		cmd /c "$(cygpath --windows "$BUILD/android_test.bat")"
