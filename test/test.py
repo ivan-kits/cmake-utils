@@ -9,25 +9,39 @@ import unittest
 test_root = os.path.realpath(os.path.dirname(__file__))
 repo_root = os.path.realpath(os.path.join(test_root, '..', '..', '..'))
 
+usage = """Usage:
+export NDK=/path/to/ndk # default $ANDROID_NDK_HOME
+export OUT=/path/to/test/output # default %s/../../../out
+export CMAKE=/path/to/cmake/package # default $OUT/cmake/install
+%s""" % (os.path.dirname(sys.argv[0]), ' '.join(sys.argv))
+
 if 'NDK' in os.environ:
     ndk = os.environ.get('NDK')
 elif 'ANDROID_NDK_HOME' in os.environ:
     ndk = os.environ.get('ANDROID_NDK_HOME')
 else:
-    print('Usage: NDK=/path/to/ndk %s' % ' '.join(sys.argv))
-    exit()
+    sys.exit(usage)
 if not os.path.isdir(ndk):
     raise Exception('Invalid NDK: %s' % ndk)
 ndk = os.path.realpath(ndk)
+
 if 'OUT' in os.environ:
     out = os.environ.get('OUT')
 else:
     out = os.path.join(repo_root, 'out')
 if not os.path.isdir(out):
-    raise Exception('Invalid build directory: %s' % out)
+    os.makedirs(out)
+out = os.path.realpath(out)
+
+if 'CMAKE' in os.environ:
+    cmake_root = os.path.join(os.environ.get('CMAKE'))
+else:
+    cmake_root = os.path.join(out, 'cmake', 'install')
+if not os.path.isdir(cmake_root):
+    sys.exit(usage)
+cmake_root = os.path.realpath(cmake_root)
 
 tmp = os.path.join(out, 'cmake', 'test')
-cmake_root = os.path.join(out, 'cmake', 'install')
 cmake = os.path.join(cmake_root, 'bin', 'cmake')
 ninja = os.path.join(cmake_root, 'bin', 'ninja')
 ndk_build = os.path.join(ndk, 'ndk-build')
