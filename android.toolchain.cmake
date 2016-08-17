@@ -340,6 +340,10 @@ elseif(NOT IS_DIRECTORY "${ANDROID_NDK}/platforms/${ANDROID_PLATFORM}")
 elseif(NOT IS_DIRECTORY "${CMAKE_SYSROOT}")
 	message(FATAL_ERROR "Invalid Android sysroot: ${CMAKE_SYSROOT}.")
 endif()
+# Check if source.properties file exists.
+if(NOT EXISTS "${ANDROID_NDK}/source.properties")
+	message(FATAL_ERROR "Missing file: ${ANDROID_NDK}/source.properties. Please use NDK r12+.")
+endif()
 file(READ "${ANDROID_NDK}/source.properties" ANDROID_NDK_SOURCE_PROPERTIES)
 set(ANDROID_NDK_SOURCE_PROPERTIES_REGEX
 	"^Pkg\\.Desc = Android NDK\nPkg\\.Revision = ([0-9]+\\.[0-9]+\\.[0-9]+(-beta[0-9]+)?)\n$")
