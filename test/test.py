@@ -3,6 +3,7 @@
 import os
 import shutil
 import subprocess
+import sys
 import unittest
 
 test_root = os.path.realpath(os.path.dirname(__file__))
@@ -12,6 +13,9 @@ if 'NDK' in os.environ:
     ndk = os.environ.get('NDK')
 elif 'ANDROID_NDK_HOME' in os.environ:
     ndk = os.environ.get('ANDROID_NDK_HOME')
+else:
+    print('Usage: NDK=/path/to/ndk %s' % ' '.join(sys.argv))
+    exit()
 if not os.path.isdir(ndk):
     raise Exception('Invalid NDK: %s' % ndk)
 ndk = os.path.realpath(ndk)
