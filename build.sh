@@ -80,6 +80,8 @@ case "$OS" in
 			CMAKE_OPTIONS+=(-DCMAKE_USE_OPENSSL=ON)
 			OPENSSL=$ROOT_DIR/external/openssl
 			CMAKE_OPTIONS+=(-DOPENSSL_INCLUDE_DIR="$OPENSSL/include")
+                        CMAKE_OPTIONS+=(-DOPENSSL_USE_STATIC_LIBS=ON)
+                        CMAKE_OPTIONS+=(-DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc")
 		fi
 		PATH=$NINJA_DIR:$PATH "$CMAKE" "${CMAKE_OPTIONS[@]}"
 		DESTDIR=$INSTALL "$CMAKE" --build "$BUILD" --target install
