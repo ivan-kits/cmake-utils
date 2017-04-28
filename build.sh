@@ -84,7 +84,7 @@ case "$OS" in
                         CMAKE_OPTIONS+=(-DCMAKE_EXE_LINKER_FLAGS="-static-libstdc++ -static-libgcc")
 		fi
 		PATH=$NINJA_DIR:$PATH "$CMAKE" "${CMAKE_OPTIONS[@]}"
-		DESTDIR=$INSTALL "$CMAKE" --build "$BUILD" --target install
+		DESTDIR=$INSTALL "$CMAKE" --build "$BUILD" --target install/strip
 		;;
 	windows)
 		CMAKE_OPTIONS+=(-H"$(cygpath --windows "$SOURCE")")
@@ -99,7 +99,7 @@ case "$OS" in
 		set INSTALL=$(cygpath --windows "$INSTALL")
 		%CMAKE% $(printf '"%s" ' "${CMAKE_OPTIONS[@]}")
 		set DESTDIR=%INSTALL%
-		%CMAKE% --build %BUILD% --target install
+		%CMAKE% --build %BUILD% --target install/strip
 		EOF
 		cmd /c "$(cygpath --windows "$BUILD/android_build.bat")"
 		;;
