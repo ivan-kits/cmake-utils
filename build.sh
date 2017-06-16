@@ -99,7 +99,7 @@ case "$OS" in
 		set INSTALL=$(cygpath --windows "$INSTALL")
 		%CMAKE% $(printf '"%s" ' "${CMAKE_OPTIONS[@]}")
 		set DESTDIR=%INSTALL%
-		%CMAKE% --build %BUILD% --target install/strip
+		%CMAKE% --build %BUILD% --target install
 		EOF
 		cmd /c "$(cygpath --windows "$BUILD/android_build.bat")"
 		;;
