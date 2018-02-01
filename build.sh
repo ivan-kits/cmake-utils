@@ -53,8 +53,8 @@ CMAKE_UTILS=$ROOT_DIR/tools/cmake-utils
 ANDROID_CMAKE=$ROOT_DIR/external/android-cmake
 PREBUILTS=$ROOT_DIR/prebuilts
 NINJA_DIR=$PREBUILTS/ninja/$OS-x86
-CMAKE=$PREBUILTS/cmake/$OS-x86/bin/cmake
-CTEST=$PREBUILTS/cmake/$OS-x86/bin/ctest
+CMAKE=$PREBUILTS/cmake/$OS-x86/3.8.2/bin/cmake
+CTEST=$PREBUILTS/cmake/$OS-x86/3.8.2/bin/ctest
 
 BUILD=$OUT/cmake/build
 INSTALL=$OUT/cmake/install
