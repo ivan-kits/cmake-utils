@@ -11,7 +11,7 @@ uname -a
 echo git config core.autocrlf:
 git config core.autocrlf
 
-echo git config --global core.safecrlf:
+echo git config core.safecrlf:
 git config core.safecrlf
 
 # exit on error
@@ -107,11 +107,12 @@ case "$OS" in
 		set CMAKE=$(cygpath --windows "$CMAKE.exe")
 		set BUILD=$(cygpath --windows "$BUILD")
 		set INSTALL=$(cygpath --windows "$INSTALL")
+		dir %CMAKE%
 		%CMAKE% $(printf '"%s" ' "${CMAKE_OPTIONS[@]}")
 		set DESTDIR=%INSTALL%
 		%CMAKE% --build %BUILD% --target install
 		EOF
-		cmd /C "$(cygpath --windows "$BUILD/android_build.bat")"
+		cmd.exe /C "$(cygpath --windows "$BUILD/android_build.bat")"
 		;;
 esac
 
