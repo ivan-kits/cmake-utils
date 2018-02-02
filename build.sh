@@ -107,7 +107,7 @@ case "$OS" in
 		set CMAKE=$(cygpath --windows "$CMAKE.exe")
 		set BUILD=$(cygpath --windows "$BUILD")
 		set INSTALL=$(cygpath --windows "$INSTALL")
-		dir %CMAKE%
+		%CMAKE% --version
 		%CMAKE% $(printf '"%s" ' "${CMAKE_OPTIONS[@]}")
 		set DESTDIR=%INSTALL%
 		%CMAKE% --build %BUILD% --target install
