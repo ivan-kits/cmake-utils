@@ -111,9 +111,10 @@ case "$OS" in
         if %OS%==32BIT echo This is a 32bit operating system
         if %OS%==64BIT echo This is a 64bit operating system
 		"%CMAKE%" --version
-		"%CMAKE%" --version > look.txt
+		echo Before > look.txt
+		"%CMAKE%" --version >> look.txt
+		echo After %ERRORLEVEL% >> look.txt
 		type look.txt
-		
 		%CMAKE% $(printf '"%s" ' "${CMAKE_OPTIONS[@]}")
 		set DESTDIR=%INSTALL%
 		%CMAKE% --build %BUILD% --target install
