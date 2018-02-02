@@ -105,7 +105,7 @@ case "$OS" in
 		set DESTDIR=%INSTALL%
 		%CMAKE% --build %BUILD% --target install
 		EOF
-		cmd /c "$(cygpath --windows "$BUILD/android_build.bat")"
+		winpty "$(cygpath --windows "$BUILD/android_build.bat")"
 		;;
 esac
 
