@@ -113,6 +113,7 @@ case "$OS" in
 		"%CMAKE%" --version
 		"%CMAKE%" --version > look.txt
 		type look.txt
+		
 		%CMAKE% $(printf '"%s" ' "${CMAKE_OPTIONS[@]}")
 		set DESTDIR=%INSTALL%
 		%CMAKE% --build %BUILD% --target install
