@@ -5,6 +5,9 @@
 # $2 = dest_dir
 # $3 = build_number
 
+echo Bash version:
+uname -a
+
 # exit on error
 set -e
 
