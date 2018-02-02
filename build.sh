@@ -4,8 +4,15 @@
 # $1 = out_dir
 # $2 = dest_dir
 # $3 = build_number
+
 echo Bash version:
 uname -a
+
+echo git config core.autocrlf:
+git config core.autocrlf
+
+echo git config --global core.safecrlf:
+git config core.safecrlf
 
 # exit on error
 set -e
