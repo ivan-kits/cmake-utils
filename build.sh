@@ -17,7 +17,7 @@ git config core.safecrlf
 # exit on error
 set -e
 
-# calculate the root directory from the script path
+# Calculate the root directory from the script path
 # this script lives two directories down from the root
 # tools/cmake-utils/build.sh
 ROOT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd -P)
