@@ -17,6 +17,9 @@ git config core.safecrlf
 # exit on error
 set -e
 
+# Upstream version of CMake 
+CMAKE_UPSTREAM_VERSION=3.10.2
+
 # Calculate the root directory from the script path
 # this script lives two directories down from the root
 # tools/cmake-utils/build.sh
@@ -133,8 +136,8 @@ REVISION=$(
 )
 # Use the build number for the micro version
 cat > "$INSTALL/source.properties" <<-EOF
-Pkg.Revision=$REVISION.$BNUM
-Pkg.Desc=CMake $REVISION.$BNUM
+Pkg.Revision=$CMAKE_UPSTREAM_VERSION
+Pkg.Desc=CMake $CMAKE_UPSTREAM_VERSION
 Pkg.Path=cmake;$REVISION.$BNUM
 EOF
 
