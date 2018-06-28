@@ -136,9 +136,9 @@ REVISION=$(
 )
 # Use the build number for the micro version
 cat > "$INSTALL/source.properties" <<-EOF
-Pkg.Revision=$CMAKE_UPSTREAM_VERSION
-Pkg.Desc=CMake $CMAKE_UPSTREAM_VERSION
-Pkg.Path=cmake;$REVISION.$BNUM
+Pkg.Revision=$CMAKE_UPSTREAM_VERSION.$BNUM
+Pkg.Desc=CMake
+Pkg.Path=cmake;$CMAKE_UPSTREAM_VERSION.$BNUM
 EOF
 
 install -m 644 "$CMAKE_UTILS/android.toolchain.cmake"   "$INSTALL/"
