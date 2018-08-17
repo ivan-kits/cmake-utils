@@ -136,11 +136,11 @@ REVISION=$(
 )
 # Use the build number for the micro version
 cat > "$INSTALL/source.properties" <<-EOF
-Pkg.Revision=$CMAKE_UPSTREAM_VERSION
-Pkg.Desc=$CMAKE_UPSTREAM_VERSION.$BNUM
-Pkg.Path=cmake;$CMAKE_UPSTREAM_VERSION.$BNUM
+Pkg.Revision=$CMAKE_UPSTREAM_VERSION.$BNUM
 EOF
 
+#Pkg.Path=cmake;$CMAKE_UPSTREAM_VERSION.$BNUM
+#Pkg.Desc=$CMAKE_UPSTREAM_VERSION.$BNUM
 install -m 644 "$CMAKE_UTILS/android.toolchain.cmake"   "$INSTALL/"
 install -m 644 "$ANDROID_CMAKE/AndroidNdkModules.cmake" "$INSTALL/share/cmake-$REVISION/Modules/"
 install -m 644 "$ANDROID_CMAKE/AndroidNdkGdb.cmake"     "$INSTALL/share/cmake-$REVISION/Modules/"
