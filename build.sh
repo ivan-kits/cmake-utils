@@ -19,6 +19,7 @@ set -e
 
 # Upstream version of CMake 
 CMAKE_UPSTREAM_VERSION=3.10.2
+CMAKE_UPSTREAM_VERSION_MAJOR_MINOR=3.2
 
 # Calculate the root directory from the script path
 # this script lives two directories down from the root
@@ -136,7 +137,7 @@ REVISION=$(
 )
 # Use the build number for the micro version
 cat > "$INSTALL/source.properties" <<-EOF
-Pkg.Revision=$CMAKE_UPSTREAM_VERSION.$BNUM
+Pkg.Revision=$CMAKE_UPSTREAM_VERSIONi_MAJOR_MINOR.$BNUM
 EOF
 
 #Pkg.Path=cmake;$CMAKE_UPSTREAM_VERSION.$BNUM
