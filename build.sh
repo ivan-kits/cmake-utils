@@ -139,7 +139,7 @@ REVISION=$(
 cat > "$INSTALL/source.properties" <<-EOF
 Pkg.Revision=$CMAKE_UPSTREAM_VERSION
 Pkg.Path=cmake;$CMAKE_UPSTREAM_VERSION.$BNUM
-Pkg.Desc=d$CMAKE_UPSTREAM_VERSION_MAJOR_MINOR.$BNUM
+Pkg.Desc=$CMAKE_UPSTREAM_VERSION_MAJOR_MINOR.$BNUM
 EOF
 
 install -m 644 "$CMAKE_UTILS/android.toolchain.cmake"   "$INSTALL/"
