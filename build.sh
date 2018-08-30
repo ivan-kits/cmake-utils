@@ -1,5 +1,6 @@
 #!/bin/bash
 # Build and test CMake deployed in Android Studio SDK.
+#
 # Expected arguments:
 # $1 = out_dir
 # $2 = dest_dir
