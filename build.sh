@@ -20,7 +20,6 @@ set -e
 
 # Upstream version of CMake 
 CMAKE_UPSTREAM_VERSION=3.10.2
-CMAKE_UPSTREAM_VERSION_MAJOR_MINOR=3.2
 
 # Calculate the root directory from the script path
 # this script lives two directories down from the root
@@ -138,9 +137,10 @@ REVISION=$(
 )
 # Use the build number for the micro version
 cat > "$INSTALL/source.properties" <<-EOF
+# Revision must have three parts, this is the Kitware CMake version like 3.10.2
 Pkg.Revision=$CMAKE_UPSTREAM_VERSION
 Pkg.Path=cmake;$CMAKE_UPSTREAM_VERSION.$BNUM
-Pkg.Desc=$CMAKE_UPSTREAM_VERSION_MAJOR_MINOR.$BNUM
+Pkg.Desc=CMake $CMAKE_UPSTREAM_VERSION.$BNUM
 EOF
 
 install -m 644 "$CMAKE_UTILS/android.toolchain.cmake"   "$INSTALL/"
