@@ -137,7 +137,6 @@ REVISION=$(
 )
 # Use the build number for the micro version
 cat > "$INSTALL/source.properties" <<-EOF
-# Revision must have three parts, this is the Kitware CMake version like 3.10.2
 Pkg.Revision=$CMAKE_UPSTREAM_VERSION
 Pkg.Path=cmake;$CMAKE_UPSTREAM_VERSION.$BNUM
 Pkg.Desc=CMake $CMAKE_UPSTREAM_VERSION.$BNUM
